@@ -15,7 +15,7 @@ contract Staker {
 
     mapping(address=>uint256) public balances;
     uint256 public constant threshhold = 1 ether;
-    uint256 public deadline = block.timestamp + 90 seconds;
+    uint256 public deadline = block.timestamp + 72 hours;
     bool executed = false;
     bool openForWithdraw = false;
     event Stake(address staker, uint256 value);
@@ -46,7 +46,14 @@ contract Staker {
     }
 
     function withdraw()public returns(bool){
-        if(openForWithdraw) return true;
+        if(openForWithdraw){
+            if (balances[msg.sender] != 0){
+                address payable sender = payable(msg.sender);
+                sender.transfer(balances[msg.sender]);
+                delete(balances[msg.sender]);
+                return true;}
+            }
+
         return false;
     }
 
